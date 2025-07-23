@@ -31,6 +31,9 @@ exports.getBooks = async (req, res) => {
         ...(genre && {genre}),
         ...(author && {author})
       },
+      include:{
+        reviews:true
+      },
       orderBy:{
         createdAt:"desc"
       }
