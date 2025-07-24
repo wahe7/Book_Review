@@ -5,7 +5,7 @@ const {createBook,getBooks,getBookById} = require("../controllers/bookController
 const authMiddleware = require("../middlewares/authMiddleware");
 
 router.post("/",authMiddleware,createBook);
-router.get("/",authMiddleware,getBooks);
-router.get("/:id",authMiddleware,getBookById);
+router.get("/",getBooks);
+router.get("/:id",getBookById);
 
 module.exports = router;
