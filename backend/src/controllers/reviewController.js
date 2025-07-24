@@ -2,7 +2,8 @@ const { PrismaClient } = require("../../generated/prisma/client");
 const prisma = new PrismaClient();
 
 exports.createReview = async (req, res) => {
-  const {bookId, rating, reviewText} = req.body;
+  const {bookId} = req.params;
+  const { rating, reviewText} = req.body;
   const userId = req.user.userId;
 
   if(!bookId || !rating || !reviewText){
@@ -12,7 +13,7 @@ exports.createReview = async (req, res) => {
   try{
     const newReview = await prisma.review.create({
       data:{
-        bookId,
+        bookId:parseInt(bookId),
         rating,
         reviewText,
         userId,
@@ -21,5 +22,27 @@ exports.createReview = async (req, res) => {
     return res.status(201).json({message:"Review created successfully",newReview});
   }catch(err){
     return res.status(500).json({message:"Internal server error"});
+  }
+};
+
+exports.getReview = async (req, res)=>{
+  const {bookId} = req.params;
+  try{
+    const reviews = await prisma.review.findMany(
+      {
+        where:{
+          bookId: parseInt(bookId)
+        },
+        include:{
+          user:true
+        },
+        orderBy:{
+          createdAt:"desc"
+        }
+      }
+    )
+    return res.status(200).json(reviews);
+  }catch(e){
+    console.log(e.message);
   }
 };
