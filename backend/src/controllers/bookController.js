@@ -28,8 +28,18 @@ exports.getBooks = async (req, res) => {
   try {
     const books = await prisma.book.findMany({
       where:{
-        ...(genre && {genre}),
-        ...(author && {author})
+        ...(genre && {
+          genre: {
+            contains: genre,
+            mode: 'insensitive'
+          }
+        }),
+        ...(author && {
+          author: {
+            contains: author,
+            mode: 'insensitive'
+          }
+        })
       },
       include:{
         reviews:true
@@ -42,7 +52,7 @@ exports.getBooks = async (req, res) => {
       return res.status(404).json({ message: "No books found" });
     }
 
-    const avgReview = books.map(book=>{
+    const allbooks = books.map(book=>{
       const reviews = book.reviews || [];
       const rating = reviews.map(r=>r.rating).filter(Boolean);
 
@@ -50,7 +60,7 @@ exports.getBooks = async (req, res) => {
       return {...book,avgReview:avg, reviewCount:reviews.length};
     })
 
-    res.json({avgReview});
+    res.json({allbooks});
   } catch (err) {
     return res.status(500).json({ message: "Internal server error" });
   }
