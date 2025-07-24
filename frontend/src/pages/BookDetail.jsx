@@ -13,7 +13,7 @@ const BookDetail = () => {
   const fetchBook = async () => {
     try {
       const bookRes = await API.get(`/books/${id}`);
-      setBook(bookRes.data.book);
+      setBook(bookRes.data.bookRes);
 
       const reviewsRes = await API.get(`/reviews/${id}`);
       setBook(prev => ({

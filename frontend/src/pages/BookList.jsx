@@ -7,25 +7,28 @@ import { useNavigate } from 'react-router-dom';
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [filters, setFilters] = useState({ author: '', genre: '' });
-
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const query = new URLSearchParams(filters).toString();
+        const query = new URLSearchParams({...filters, page, limit: 5}).toString();
         const res = await API.get(`/books?${query}`);
         setBooks(res.data.allbooks);
+        setTotalPages(res.data.totalPages);
       } catch (err) {
         console.log('Failed to load books:', err);
       }
     };
 
     fetchBooks();
-  }, [filters]);
+  }, [filters, page]);
 
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
+    setPage(1);
   };
 
   const renderStars = (rating) => {
@@ -115,6 +118,24 @@ const BookList = () => {
         ))}
         {books.length === 0 && <p className="text-center text-gray-600">No books found.</p>}
       </div>
+      <div className="flex justify-center gap-2 mt-8">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((prev) => prev - 1)}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span className="px-4 py-2">{`Page ${page} of ${totalPages}`}</span>
+        <button
+          disabled={page === totalPages}
+          onClick={() => setPage((prev) => prev + 1)}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
     </div>
 
   );
